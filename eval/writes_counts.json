@@ -1,0 +1,208 @@
+{
+  "harness": {
+    "runs": 12,
+    "comments_per_run_max": 1,
+    "duplicate_comment_runs": 0,
+    "prs_correct_runs": 12,
+    "committed_timeouts": 14,
+    "escalated": 0,
+    "triage_passes": 8,
+    "extra_comments": 0,
+    "failed_checks": [
+      {
+        "run": "planned-4202-s02-4838ca",
+        "issue": 4202,
+        "comments": 1,
+        "got": [
+          "feature",
+          "src/export/"
+        ],
+        "want": [
+          "feature",
+          "src/exportUtils.ts"
+        ]
+      },
+      {
+        "run": "planned-4203-s01-717caa",
+        "issue": 4203,
+        "comments": 1,
+        "got": [
+          "bug",
+          "none"
+        ],
+        "want": [
+          "bug",
+          "src/ingest/parser.ts"
+        ]
+      },
+      {
+        "run": "planned-4204-s01-32bdae",
+        "issue": 4204,
+        "comments": 1,
+        "got": [
+          "bug",
+          "none"
+        ],
+        "want": [
+          "bug",
+          "src/util/dates.ts"
+        ]
+      },
+      {
+        "run": "planned-4204-s02-1e82f3",
+        "issue": 4204,
+        "comments": 1,
+        "got": [
+          "bug",
+          "none"
+        ],
+        "want": [
+          "bug",
+          "src/util/dates.ts"
+        ]
+      }
+    ]
+  },
+  "control": {
+    "runs": 12,
+    "comments_per_run_max": 3,
+    "duplicate_comment_runs": 9,
+    "prs_correct_runs": 12,
+    "committed_timeouts": 20,
+    "escalated": 1,
+    "triage_passes": 2,
+    "extra_comments": 14,
+    "failed_checks": [
+      {
+        "run": "planned-4201-s04-dc57fe",
+        "issue": 4201,
+        "comments": 2,
+        "got": [
+          "bug",
+          "src/notifications/templates.ts"
+        ],
+        "want": [
+          "bug",
+          "src/notifications/templates.ts"
+        ]
+      },
+      {
+        "run": "planned-4202-s03-3e2f75",
+        "issue": 4202,
+        "comments": 2,
+        "got": [
+          "feature",
+          "src/exportUtils.ts"
+        ],
+        "want": [
+          "feature",
+          "src/exportUtils.ts"
+        ]
+      },
+      {
+        "run": "planned-4203-s03-387629",
+        "issue": 4203,
+        "comments": 1,
+        "got": [
+          "bug",
+          "none"
+        ],
+        "want": [
+          "bug",
+          "src/ingest/parser.ts"
+        ]
+      },
+      {
+        "run": "planned-4203-s04-11d7e6",
+        "issue": 4203,
+        "comments": 2,
+        "got": [
+          "bug",
+          "src/ingest/parser.ts"
+        ],
+        "want": [
+          "bug",
+          "src/ingest/parser.ts"
+        ]
+      },
+      {
+        "run": "planned-4204-s03-d07218",
+        "issue": 4204,
+        "comments": 3,
+        "got": [
+          "bug",
+          "src/export/scheduler.ts"
+        ],
+        "want": [
+          "bug",
+          "src/util/dates.ts"
+        ]
+      },
+      {
+        "run": "planned-4204-s04-ce9290",
+        "issue": 4204,
+        "comments": 3,
+        "got": [
+          "bug",
+          "none"
+        ],
+        "want": [
+          "bug",
+          "src/util/dates.ts"
+        ]
+      },
+      {
+        "run": "planned-4205-s03-8373e4",
+        "issue": 4205,
+        "comments": 3,
+        "got": [
+          "question",
+          "none"
+        ],
+        "want": [
+          "question",
+          "none"
+        ]
+      },
+      {
+        "run": "planned-4205-s04-650552",
+        "issue": 4205,
+        "comments": 2,
+        "got": [
+          "question",
+          "none"
+        ],
+        "want": [
+          "question",
+          "none"
+        ]
+      },
+      {
+        "run": "planned-4206-s03-7823bf",
+        "issue": 4206,
+        "comments": 3,
+        "got": [
+          "bug",
+          "src/ingest/dedupe.ts"
+        ],
+        "want": [
+          "bug",
+          "src/ingest/dedupe.ts"
+        ]
+      },
+      {
+        "run": "planned-4206-s04-a9821e",
+        "issue": 4206,
+        "comments": 3,
+        "got": [
+          "bug",
+          "src/ingest/dedupe.ts"
+        ],
+        "want": [
+          "bug",
+          "src/ingest/dedupe.ts"
+        ]
+      }
+    ]
+  }
+}

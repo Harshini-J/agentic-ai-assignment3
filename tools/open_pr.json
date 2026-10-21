@@ -1,14 +1,21 @@
 {
   "name": "open_pr",
-  "description": "Open a pull request.",
+  "description": "Open one draft pull request for an issue, from the branch repomind/issue-<number>; no commits are made. Call it at most once per issue, before post_comment_issue, and only when the triage names a file: when the file is none, do not call it. A pull request can be closed later and a comment cannot, which is why it comes first. The body names the file to change and proposes the change in prose. Returns one confirmation line of under 200 characters, such as 'Opened draft pull request 3 from repomind/issue-4191 for issue-4191.'. There is no empty result: success is the confirmation line, and a wrong branch, an empty or over-long title (120 characters) or body (4,000), or an unknown issue is an error that says what to fix, including the exact branch name.",
+  "strict": true,
   "input_schema": {
     "type": "object",
     "properties": {
-      "number": {"type": "integer", "description": "Issue number"},
-      "branch": {"type": "string", "description": "Branch"},
-      "title": {"type": "string", "description": "Title"},
-      "body": {"type": "string", "description": "Body"}
+      "number": {"type": "integer", "description": "The issue's number as a positive integer: 4417 for issue-4417."},
+      "branch": {"type": "string", "description": "The branch to open the pull request from: repomind/issue- followed by the same issue number, such as repomind/issue-4417. It identifies the pull request, so always build it from the number and never invent another name."},
+      "title": {"type": "string", "description": "One-line pull request title, 1 to 120 characters, that says what the change does."},
+      "body": {"type": "string", "description": "The pull request description, 1 to 4,000 characters: the file to change and the proposed change in prose. A reader decides from this text alone whether the change is worth making."}
     },
-    "required": ["number", "branch", "title", "body"]
-  }
+    "required": ["number", "branch", "title", "body"],
+    "additionalProperties": false
+  },
+  "examples": [
+    {"input": {"number": 4192, "branch": "repomind/issue-4192", "title": "Fix the export button bug", "body": "File: src/components/ExportButton.tsx. Fix the bug the issue describes in this component."}, "note": "typical: a bug where the triage named a source file"},
+    {"input": {"number": 4191, "branch": "repomind/issue-4191", "title": "Correct the README", "body": "File: README.md. Fix the section the issue says is wrong or missing."}, "note": "hard: the file is a document, not source code; the branch is still built from the issue number"}
+  ],
+  "result_shape": {"format": "text", "max_chars": 400}
 }

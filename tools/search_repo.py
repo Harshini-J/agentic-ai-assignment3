@@ -30,6 +30,8 @@ MAX_QUERY_CHARS = 200
 INDEX = "fixtures/search_index/index.json"
 GLOB_CHARS = re.compile(r"^[A-Za-z0-9_.\-/*?\[\]{},]+$")
 
+CONCISE = {"max_results": 5, "excerpt_chars": 80}
+DETAILED = {"max_results": HARD_CAP, "excerpt_chars": 160}
 
 def glob_problem(pattern: str) -> str | None:
     """Why `pattern` is not a valid path glob, or None when it is one."""
@@ -51,15 +53,15 @@ def glob_problem(pattern: str) -> str | None:
     return None
 
 
-def problem(query, filter=None) -> str | None:
+def problem(query, path_glob=None) -> str | None:
     """Why this search is malformed, or None when it is well-formed."""
     text = str(query or "")
     if not text.strip():
         return "the query is empty"
     if len(text) > MAX_QUERY_CHARS:
         return f"the query is {len(text)} characters long; the cap is {MAX_QUERY_CHARS}"
-    if filter not in (None, ""):
-        return glob_problem(str(filter))
+    if path_glob not in (None, ""):
+        return glob_problem(str(path_glob))
     return None
 
 
@@ -100,21 +102,32 @@ def age(built_at: str, now: float | None = None) -> str:
     days = int(((now or time.time()) - built.timestamp()) // 86400)
     return "today" if days < 1 else f"{days} day{'s' if days != 1 else ''} ago"
 
+def run(ctx, query, path_glob=None, response_format="concise", source="index"):
+    from tools import ToolError
 
-def run(ctx, query, max_results=10, filter=None, deep=False):
-    if problem(query, filter) is not None:
-        return "No matches."
+    why = problem(query, path_glob)
+    if why is not None:
+        raise ToolError(f"malformed search, nothing was searched: {why}. "
+                        f"Fix the query or path_glob and call again; this is not the same as no matches. "
+                        f"The same query or path_glob will fail again.")
+    source = str(source).lower()
+    if source not in ("index", "disk"):
+        raise ToolError(f"source must be index or disk, not {source!r}.")
+    response_format = str(response_format).lower()
+    if response_format not in ("concise", "detailed"):
+        raise ToolError(f"response_format must be concise or detailed, not {response_format!r}.")
+    mode = DETAILED if response_format == "detailed" else CONCISE
     repo_root = Path(ctx.repo_root)
-    if deep:
-        files, source = _disk(repo_root), "read from disk"
+    if source == "disk":
+        files, index_age = _disk(repo_root), "not used (read from disk)"
     else:
         index = load_index(repo_root.parent.parent)
-        files, source = index["files"], f"index built {index['built_at']}, {age(index['built_at'])}"
+        files, index_age = index["files"], age(index["built_at"])
     needle = str(query).strip().lower()
-    limit = max(1, min(int(max_results), HARD_CAP))
-    hits = [f"{rel}:{number}: {line.strip()[:160]}"
-            for rel, lines in sorted(files.items()) if _matches(rel, filter)
+    hits = [{"path": rel, "line": number, "excerpt": line.strip()[:mode["excerpt_chars"]]}
+            for rel, lines in sorted(files.items()) if _matches(rel, path_glob)
             for number, line in enumerate(lines, 1) if needle in line.lower()]
-    if not hits:
-        return "No matches."
-    return "\n".join(hits[:limit]) + f"\n[{source}; {len(hits)} matches, {min(limit, len(hits))} shown]"
+    shown = hits[:mode["max_results"]]
+    return json.dumps({"query": str(query).strip(), "query_valid": True, "path_glob": path_glob,
+                       "source": source, "index_age": index_age, "count": len(hits),
+                       "shown": len(shown), "truncated": len(hits) > len(shown), "results": shown})

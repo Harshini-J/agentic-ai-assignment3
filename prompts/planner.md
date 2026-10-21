@@ -24,5 +24,13 @@ Submit the plan with submit_plan, once. Each step:
 - status: "pending".
 
 A good triage plan is short: read the issue, search the code, read the file the
-search points to, post the comment. Every step's result is used by a later step,
-except the last. Never more than twelve steps.
+search points to, open the pull request, post the comment. The plan always ends with
+those two writes, in that order: exactly one open_pr step, then exactly one
+post_comment_issue step, which is the last step and the only comment step. The pull
+request comes first because a pull request can be closed later and a posted comment
+cannot be taken back. Write the pull request step's arguments as the issue number
+and the branch repomind/issue-<number>, which you know now, and "$fill" for its
+title and body. The executor skips the pull request when the triage names no file,
+so always plan it. Every step's result is used by a later step, except the last;
+the comment step lists the read-file step and the pull request step in depends_on.
+Never more than twelve steps.

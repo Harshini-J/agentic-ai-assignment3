@@ -1,14 +1,26 @@
 {
-  "name": "search_repo",
-  "description": "Search the code.",
+  "name": "search_code",
+  "description": "Literal, case-insensitive text search over the source files of the private codebase (config/ is never searched). Returns JSON: query (echoed back), query_valid, count (how many lines matched), shown, truncated (true when count is larger than shown), index_age (how old the prebuilt index is, or a note that it was not used when source is disk), and results, a list of {path, line, excerpt} in path order. A search that matches nothing is a success: count 0, results [], query_valid true. It means the text is not in the searched files, so try a shorter or different term rather than the same query again; if source is index, also check index_age, because an old index can miss recent changes. A malformed search is an error, never an empty result: an empty or whitespace-only query, a query over 200 characters, or a path_glob that is not a valid glob. Responses are capped: concise shows at most 5 results with excerpts cut to 80 characters, detailed at most 20 with excerpts cut to 160; truncated says when more lines matched than are shown.",
+  "strict": true,
   "input_schema": {
     "type": "object",
     "properties": {
-      "query": {"type": "string", "description": "Text to look for"},
-      "max_results": {"type": "integer", "description": "How many results. Default 10."},
-      "filter": {"type": "string", "description": "Optional filter expression"},
-      "deep": {"type": "boolean", "description": "Whether to do a deep search. Default false."}
+      "query": {"type": "string", "description": "Text to find, matched literally and case-insensitively against each line. It is not a regex and not a query language. 1 to 200 characters; an empty or longer query is an error."},
+      "path_glob": {"type": ["string", "null"], "description": "Only search files whose path matches this glob, relative to the repository root, such as src/**/*.ts or src/export/*.{ts,tsx}; the wildcards are * ? [ ] { }. Pass null to search every file. Use it when a plain search matches many unrelated files. It narrows what is searched and costs nothing extra. A glob that is not valid is an error. A glob only includes files; it cannot exclude with ! or |, so to skip a directory, name the directories you want instead, such as src/{api,components}/**."},
+      "response_format": {"type": "string", "enum": ["concise", "detailed"], "description": "concise: at most 5 results with short excerpts; the cheap choice, use it first. detailed: at most 20 results with longer excerpts; use it only when a concise search was truncated and you need more."},
+      "source": {"type": "string", "enum": ["index", "disk"], "description": "index: read the prebuilt index; fast, and index_age says how old it is. Use this first. disk: read the files themselves; slower, always current. Use it only when index_age is more than a day old, or when a search you expect to match returns count 0."}
     },
-    "required": ["query"]
+    "required": ["query", "path_glob", "response_format", "source"],
+    "additionalProperties": false
+  },
+  "examples": [
+    {"input": {"query": "export", "path_glob": null, "response_format": "concise", "source": "index"}, "note": "typical: a first search over the whole codebase, cheap format, prebuilt index"},
+    {"input": {"query": "timeout", "path_glob": "src/**/*.{ts,tsx}", "response_format": "detailed", "source": "disk"}, "note": "hard: restrict to source files with a glob, read the current files, and ask for more results after a concise search was truncated"}
+  ],
+  "result_shape": {
+    "format": "json",
+    "max_chars": 12000,
+    "fields": {"query": "string", "query_valid": "boolean", "count": "integer", "shown": "integer", "truncated": "boolean", "index_age": "string", "results": "array"},
+    "items": {"results": {"path": "string", "line": "integer", "excerpt": "string"}}
   }
 }

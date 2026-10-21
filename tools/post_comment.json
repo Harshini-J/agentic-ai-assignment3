@@ -1,12 +1,19 @@
 {
-  "name": "post_comment",
-  "description": "Post a comment on an issue.",
+  "name": "post_comment_issue",
+  "description": "Post one public comment on an issue. Whoever filed the issue can read it, and a posted comment cannot be taken back, so call it once per issue, as the last step, after the pull request step, if there is one. The comment's first two lines are 'label: <bug|feature|question|docs>' and 'file: <path relative to the repository root, or none>'; anything after them is free text, and the whole body is at most 4,000 characters. Returns one confirmation line of under 200 characters naming the comment and the issue, such as 'Posted comment 12 on issue-4191.'. There is no empty result: success is the confirmation line, and an empty or over-long body or an unknown issue is an error that says what to fix.",
+  "strict": true,
   "input_schema": {
     "type": "object",
     "properties": {
-      "number": {"type": "integer", "description": "Issue number"},
-      "body": {"type": "string", "description": "Comment text"}
+      "number": {"type": "integer", "description": "The issue's number as a positive integer: 4417 for issue-4417. Give the number only, not the title and not a URL."},
+      "body": {"type": "string", "description": "The comment text, starting with the label and file lines described above. It is posted publicly exactly as written, so check it before calling. An empty body, or one over 4,000 characters, is an error."}
     },
-    "required": ["number", "body"]
-  }
+    "required": ["number", "body"],
+    "additionalProperties": false
+  },
+  "examples": [
+    {"input": {"number": 4192, "body": "label: bug\nfile: src/components/ExportButton.tsx\n\nThe Export button stays greyed out after a failed export, so the reporter cannot retry without reloading the page."}, "note": "typical: a bug that names the file with the wrong code"},
+    {"input": {"number": 3980, "body": "label: question\nfile: none\n\nThe reporter asks how retries work; nothing needs to change."}, "note": "hard: a question names no file, so the file line says none"}
+  ],
+  "result_shape": {"format": "text", "max_chars": 400}
 }

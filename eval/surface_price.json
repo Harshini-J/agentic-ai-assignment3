@@ -1,0 +1,10 @@
+{
+  "model": "claude-sonnet-5",
+  "input_rate_per_million": 2.0,
+  "runs": 12,
+  "calls_per_run": 6.92,
+  "plan_or_revise_calls_per_run": 2.17,
+  "cost_per_run_before": 0.005285,
+  "cost_per_run_after": 0.019718,
+  "cost_per_run_all_five": 0.051668
+}

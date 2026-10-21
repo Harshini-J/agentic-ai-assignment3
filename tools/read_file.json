@@ -1,11 +1,18 @@
 {
-  "name": "read_file",
-  "description": "Read a file.",
+  "name": "read_file_code",
+  "description": "Read one file of the private codebase and return its text. The path is relative to the repository root, exactly as a search_code result prints it, and is case-sensitive. The response is capped: concise returns the first 4,000 characters, detailed the first 20,000, and a cut file ends with a note saying how many characters were shown and how many exist. An empty file returns '[empty file]'. A path that does not exist, is in config/, or is not a text file is an error that names the path, never an empty result; for a path that does not exist, the error also lists files with near-miss names.",  "strict": true,
   "input_schema": {
     "type": "object",
     "properties": {
-      "path": {"type": "string", "description": "File path"}
+      "path": {"type": "string", "description": "File path relative to the repository root, copied from a search_code result, such as src/util/money.ts. Case-sensitive: src/reports.ts is not src/Report.ts. Reading costs tokens in proportion to the length returned, so read only files a search or the issue pointed to."},
+      "response_format": {"type": "string", "enum": ["concise", "detailed"], "description": "concise: the first 4,000 characters; the cheap choice, use it first. detailed: up to 20,000 characters; use it only when a concise read ended with a truncation note and you need the rest."}
     },
-    "required": ["path"]
-  }
+    "required": ["path", "response_format"],
+    "additionalProperties": false
+  },
+  "examples": [
+    {"input": {"path": "src/util/money.ts", "response_format": "concise"}, "note": "typical: a path copied from a search result, cheap format"},
+    {"input": {"path": "src/Report.ts", "response_format": "detailed"}, "note": "hard: paths are exact and case-sensitive, so src/Report.ts, src/reports.ts and src/report.tsx are three different files"}
+  ],
+  "result_shape": {"format": "text", "max_chars": 20500}
 }

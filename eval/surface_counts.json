@@ -1,0 +1,26 @@
+{
+  "model": "claude-sonnet-5",
+  "first_commit": "fd8fd12",
+  "before": {
+    "together": 929,
+    "alone": {
+      "read_issue": 437,
+      "search_repo": 519,
+      "read_file": 427,
+      "post_comment": 460,
+      "open_pr": 502
+    },
+    "list": 156
+  },
+  "after": {
+    "together": 3735,
+    "alone": {
+      "read_issue": 733,
+      "search_code": 1400,
+      "read_file_code": 938,
+      "post_comment_issue": 964,
+      "open_pr": 1116
+    },
+    "list": 1972
+  }
+}
