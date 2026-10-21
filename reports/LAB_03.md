@@ -13,8 +13,7 @@ every count of writes must come from the tracker's database, not from your trace
  Yes. Anthropic compiles a tool's schema when it is marked `"strict": true`, and
   limits a request to 20 strict tools (`tools/audit_limits.yaml`). `make ping` with
   claude-sonnet-5 showed all 5 definitions accepted in one request, with 5 marked
-  strict (3,850 prompt tokens, 55 output tokens, $0.008250). It made three calls:
-  a tool call, a final answer, and the five definitions.
+  strict (4,755 prompt tokens, 55 output tokens, $0.010060 for the final definitions; an earlier ping, before later edits to the descriptions, was 3,850). It made three calls: a tool call, a final answer, and the five definitions.
 
 - Consolidation, in one line:
 None; no task always follows the same sequence of calls (the search and read steps depend on what the issue says, and the PR and comment are separate writes: a PR can be closed later, but a posted comment cannot be taken back), so I kept five tools.
@@ -46,8 +45,6 @@ None; no task always follows the same sequence of calls (the search and read ste
 | `read_file_code` | The file cannot be read from disk before any content is returned; safe to retry | Path does not exist (the error names near misses such as `src/Report.ts` for `src/report.ts`); path outside the repository or in `config/`; not a text file; `response_format` outside its enum | None: a read has no effect |
 | `post_comment_issue` | None: the tracker is local, and a failure before the request is sent would be safe to retry | Empty body; body over 4,000 characters; issue does not exist | Write timeout: the comment may or may not have been saved. Read comments back by key to confirm |
 | `open_pr` | None: a failure before sending is safe to retry | Branch is not `repomind/issue-<n>`; empty or over-long title or body; issue does not exist | Write timeout: the PR may or may not exist. Read back by branch or key to confirm |
-
-- Protocol errors: `end_run` or `generic_result`, and why:
 
 - Protocol errors: `generic_result`. Unknown tool names or non-object arguments are logged in full to `runs/<run_id>.harness.log`, while the model receives a fixed message under 200 characters that names no tool and explains rewording will not help. I chose this over `end_run` because one invalid call should not discard paid work or interrupt a partially completed task, such as opening a PR without posting its comment. Since the model cannot fix the error by rewording, the message makes that clear, and the run's step and token limits prevent endless retries.
 
@@ -144,7 +141,7 @@ AI tools: Anthropic Claude Code; GitHub Copilot (inline autocomplete in VS Code)
 
 Date: 19 - 21 October 2026
 
-Understanding the existing codebase: Claude Code helped me understand the starter code before I changed it: what the registry in tools/__init__.py provides (schemas, call, hooks, plan_step), what ctx provides (ctx.tracker, ctx.calls, ctx.harness_log, ctx.switches, ctx.call_tool), how harness/tracker.py simulates a lying tracker (FLAKY_WRITES, READBACK_FAIL, the attempts table), how harness/calls.py defines the call record, and where each format is defined in checks/FORMATS.md (section 11 and reports/LAB_03.json).
+Understanding the existing codebase: Claude Code helped me understand the starter code before I changed it: what the registry in `tools/__init__.py` provides (schemas, call, hooks, plan_step), what ctx provides (ctx.tracker, ctx.calls, ctx.harness_log, ctx.switches, ctx.call_tool), how `harness/tracker.py` simulates a lying tracker (FLAKY_WRITES, READBACK_FAIL, the attempts table), how harness/calls.py defines the call record, and where each format is defined in checks/FORMATS.md (section 11 and `reports/LAB_03.json`).
 
 I used it to explain parts of the assignment I didn't understand.
 

@@ -1,18 +1,18 @@
 """search_repo: literal, case-insensitive text search over the private codebase.
 
-Its definition is search_repo.json. It reads a prebuilt index,
+Its definition is search_repo.json. By default (`source: index`) it reads a prebuilt index,
 fixtures/search_index/index.json, of every text file under fixtures/repo except
-config/, and the index records when it was built. With deep set, it reads the files
-themselves instead. Results come back in path order, one line each, as
-path:line: excerpt, then one line saying when the index was built, how many lines
-matched and how many are shown: the truncation and the index's age.
+config/, and the index records when it was built; with `source: disk` it reads the files
+themselves instead. The result is JSON: the query echoed back, `query_valid`, the
+`path_glob` and `source` used, `index_age`, the match `count`, how many are `shown`,
+whether the list was `truncated`, and the `results`, one object per matching line.
 
 **Malformed**, for Assignment 3 (Part A, task 1), is any of three things:
   1. a query that is empty or only whitespace;
   2. a query longer than MAX_QUERY_CHARS;
-  3. a filter that is not a valid glob (glob_problem, below).
-This stub answers a malformed query exactly as it answers one that matched nothing,
-"No matches.": the defect Part A removes. The two must differ in the raw response.
+  3. a `path_glob` that is not a valid glob (glob_problem, below).
+A malformed search is an error and nothing is searched. A search that matches nothing
+is a success with `count: 0` and `query_valid: true`, so the two differ in the raw response.
 """
 
 from __future__ import annotations
